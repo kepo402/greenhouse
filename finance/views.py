@@ -1,9 +1,15 @@
 from django.shortcuts import render
-from .models import Room, Contribution, Expense
+from .models import Room, Contribution, Expense, Announcement
 from django.db.models import Sum
 from datetime import datetime
 
 def dashboard(request):
+
+
+    Announcement.delete_old_non_important()
+
+    announcements = Announcement.objects.order_by('-is_important', '-date_posted')
+
     # Get selected month (e.g., '2025-10')
     selected_month = request.GET.get('month')
     month_name = None
@@ -51,6 +57,7 @@ def dashboard(request):
         'total_contributions_all': total_contributions_all,
         'total_expenses_all': total_expenses_all,
         'balance_all': balance_all,
+        'announcements': announcements,
     }
 
     return render(request, 'finance/dashboard.html', context)

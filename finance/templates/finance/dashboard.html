@@ -27,9 +27,33 @@
         .section {
             margin-top: 40px;
         }
+        /* Optional: pause scrolling on hover */
+        #announcement-bar:hover #announcement-message {
+            animation-play-state: paused;
+        }
     </style>
 </head>
 <body>
+
+    <!-- 🗞️ Announcement Bar (shows one message at a time) -->
+    <div id="announcement-bar" style="
+        background-color:#bbf7d0;
+        padding:10px 0;
+        margin-bottom:20px;
+        text-align:center;
+        overflow:hidden;
+        position:relative;
+        height:40px;
+    ">
+        <div id="announcement-message" style="
+            position:absolute;
+            white-space:nowrap;
+            font-size:1.1rem;
+            color:#065f46;
+            left:100%;
+        "></div>
+    </div>
+
     <h1>🏠 Green House Hostel Finance Dashboard</h1>
 
     <div class="filter">
@@ -90,5 +114,56 @@
         <p><strong>Total Expenses:</strong> ₦{{ total_expenses_all|floatformat:2 }}</p>
         <p><strong>Balance:</strong> ₦{{ balance_all|floatformat:2 }}</p>
     </div>
+
+    <script>
+       
+    const announcements = [
+        {% for a in announcements %}
+            {
+                text: "{{ a.message|escapejs }}",
+                important: {% if a.is_important %}true{% else %}false{% endif %}
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+
+        let currentIndex = 0;
+        const msgDiv = document.getElementById("announcement-message");
+
+        function showNextMessage() {
+            if (announcements.length === 0) return;
+
+            const item = announcements[currentIndex];
+            msgDiv.textContent = item.text;
+
+            // Style based on importance
+            msgDiv.style.fontWeight = item.important ? "normal" : "bold";
+            msgDiv.style.color = item.important ? "#064e3b" : "#065f46";
+
+            // Restart animation
+            msgDiv.style.animation = "none";
+            void msgDiv.offsetWidth; // reflow trick
+            msgDiv.style.animation = "scrollMessage 10s linear forwards";
+
+            // After animation ends, show next
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % announcements.length;
+                showNextMessage();
+            }, 10000); // 10s per message
+        }
+
+        // Define CSS keyframes
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes scrollMessage {
+                0% { left: 100%; opacity: 1; }
+                100% { left: -100%; opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Start the loop
+        showNextMessage();
+    </script>
 </body>
 </html>
