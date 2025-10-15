@@ -317,55 +317,49 @@ th {
         const msgDiv = document.getElementById("announcement-message");
         let currentIndex = 0;
     
-        function getScrollDuration(textLength) {
-            const width = window.innerWidth;
-            // Longer messages scroll longer
-            let baseTime = Math.max(10, textLength / 10);
-            if (width <= 500) baseTime *= 1.5;
-            return baseTime;
-        }
-    
-        function showNextMessage() {
-            if (!announcements.length) return;
+        function animateMessage() {
+            if (announcements.length === 0) return;
     
             const item = announcements[currentIndex];
             msgDiv.textContent = item.text;
     
-            // Apply styles
+            // Style important vs normal
             msgDiv.style.fontWeight = item.important ? "bold" : "normal";
             msgDiv.style.color = item.important ? "#064e3b" : "#065f46";
     
-            // Reset position before each scroll
-            msgDiv.style.left = "100%";
-            msgDiv.style.transition = "none";
+            const containerWidth = msgDiv.parentElement.offsetWidth;
+            const textWidth = msgDiv.scrollWidth;
     
-            // Wait a tiny bit before scrolling
-            setTimeout(() => {
-                const textWidth = msgDiv.offsetWidth;
-                const duration = getScrollDuration(textWidth);
+            let pos = containerWidth;
+            const speed = window.innerWidth <= 500 ? 1.2 : 2; // slower on small screens
     
-                msgDiv.style.transition = `left ${duration}s linear`;
-                msgDiv.style.left = `-${textWidth}px`;
+            // Smooth JS animation (not CSS)
+            function step() {
+                pos -= speed;
+                msgDiv.style.left = pos + "px";
     
-                // Move to the next message after it fully scrolls out
-                setTimeout(() => {
+                if (pos + textWidth > 0) {
+                    requestAnimationFrame(step);
+                } else {
+                    // move to next message
                     currentIndex = (currentIndex + 1) % announcements.length;
-                    showNextMessage();
-                }, duration * 1000 + 500);
-            }, 300);
+                    setTimeout(animateMessage, 500); // small pause before next
+                }
+            }
+    
+            // reset position and start
+            msgDiv.style.left = containerWidth + "px";
+            requestAnimationFrame(step);
         }
     
-        // Start loop
-        showNextMessage();
+        // start animation
+        animateMessage();
     
-        // Restart animation on resize
+        // re-trigger when resized
         window.addEventListener("resize", () => {
-            msgDiv.style.transition = "none";
             msgDiv.style.left = "100%";
-            showNextMessage();
         });
     </script>
-    
     
 </body>
 </html>
