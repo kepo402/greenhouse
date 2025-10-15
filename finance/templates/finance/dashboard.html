@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Green House Hostel Finance Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0fdf4;
+            color: #065f46;
+            margin: 40px;
+        }
+        h1 { color: #15803d; }
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th { background-color: #bbf7d0; }
+    </style>
+</head>
+<body>
+    <h1>🏠 Green House Hostel Finance Dashboard</h1>
+
+    <h3>Summary</h3>
+    <p><strong>Total Contributions:</strong> ₦{{ total_contributions|floatformat:2 }}</p>
+    <p><strong>Total Expenses:</strong> ₦{{ total_expenses|floatformat:2 }}</p>
+    <p><strong>Balance:</strong> ₦{{ balance|floatformat:2 }}</p>
+
+    <h3>Room Contributions</h3>
+    <table>
+        <tr>
+            <th>Room</th>
+            <th>Total Contributions (₦)</th>
+        </tr>
+        {% for r in room_data %}
+        <tr>
+            <td>{{ r.room }}</td>
+            <td>{{ r.total|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
