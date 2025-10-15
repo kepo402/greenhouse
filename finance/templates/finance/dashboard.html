@@ -12,7 +12,7 @@
         }
         h1 { color: #15803d; }
         table {
-            width: 60%;
+            width: 80%;
             border-collapse: collapse;
             margin-top: 20px;
         }
@@ -21,29 +21,74 @@
             border: 1px solid #ccc;
         }
         th { background-color: #bbf7d0; }
+        .filter {
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
     <h1>🏠 Green House Hostel Finance Dashboard</h1>
 
-    <h3>Summary</h3>
-    <p><strong>Total Contributions:</strong> ₦{{ total_contributions|floatformat:2 }}</p>
-    <p><strong>Total Expenses:</strong> ₦{{ total_expenses|floatformat:2 }}</p>
-    <p><strong>Balance:</strong> ₦{{ balance|floatformat:2 }}</p>
+    <div class="filter">
+        <form method="get">
+            <label for="month">Select Month:</label>
+            <input type="month" id="month" name="month" value="{{ selected_month }}">
+            <button type="submit">View</button>
+            {% if month_name %}
+                <p><strong>Showing records for:</strong> {{ month_name }}</p>
+            {% endif %}
+        </form>
+    </div>
 
-    <h3>Room Contributions</h3>
-    <table>
-        <tr>
-            <th>Room</th>
-            <th>Total Contributions (₦)</th>
-        </tr>
-        {% for r in room_data %}
-        <tr>
-            <td>{{ r.room }}</td>
-            <td>{{ r.total|floatformat:2 }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="section">
+        <h2>📅 Monthly Summary</h2>
+        <p><strong>Total Contributions:</strong> ₦{{ total_contributions_month|floatformat:2 }}</p>
+        <p><strong>Total Expenses:</strong> ₦{{ total_expenses_month|floatformat:2 }}</p>
+        <p><strong>Balance:</strong> ₦{{ balance_month|floatformat:2 }}</p>
+
+        <h3>Room Contributions ({{ month_name|default:"All Months" }})</h3>
+        <table>
+            <tr>
+                <th>Room</th>
+                <th>Total (₦)</th>
+            </tr>
+            {% for r in room_data %}
+            <tr>
+                <td>{{ r.room }}</td>
+                <td>{{ r.total|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">No rooms found</td></tr>
+            {% endfor %}
+        </table>
+
+        <h3>Expenses ({{ month_name|default:"All Months" }})</h3>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount (₦)</th>
+            </tr>
+            {% for e in expenses %}
+            <tr>
+                <td>{{ e.date_added|date:"d M, Y" }}</td>
+                <td>{{ e.description }}</td>
+                <td>{{ e.amount|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No expenses recorded.</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>💰 Overall Summary (All Time)</h2>
+        <p><strong>Total Contributions:</strong> ₦{{ total_contributions_all|floatformat:2 }}</p>
+        <p><strong>Total Expenses:</strong> ₦{{ total_expenses_all|floatformat:2 }}</p>
+        <p><strong>Balance:</strong> ₦{{ balance_all|floatformat:2 }}</p>
+    </div>
 </body>
 </html>
-
