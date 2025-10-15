@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-cxw)y=-3&ke-px7rs4(ubc3=w$i39y_3vz(-82n*@c6ivtq0nw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1','greenhouse-seven.vercel.app', '4d0d-102-88-108-82.ngrok-free.app', 'yoruba-memorize-itftjkeyx-olayinkas-projects-8dfff35b.vercel.app']
+CSRF_TRUSTED_ORIGINS = [
+    'https://greenhouse-seven.vercel.app',
+]
 
 
 # Application definition
