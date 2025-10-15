@@ -5,112 +5,124 @@
     <title>Green House Hostel Finance Dashboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0fdf4;
-            color: #065f46;
-            margin: 40px;
-        }
-        h1 { color: #15803d; }
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-        }
-        th { background-color: #bbf7d0; }
-        .filter {
-            margin-bottom: 20px;
-        }
-        .section {
-            margin-top: 40px;
-        }
-        /* Optional: pause scrolling on hover */
-        #announcement-bar:hover #announcement-message {
-            animation-play-state: paused;
-
-            /* Medium screens (tablets and large phones) */
-@media (max-width: 768px) {
-    body {
-        margin: 15px;
-        font-size: 0.9rem;
-    }
-
-    h1 {
-        font-size: 1.3rem;
-        text-align: center;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-        font-size: 0.85rem;
-    }
-
-    th, td {
-        padding: 6px 8px;
-    }
-
-    /* Announcement bar adjustments */
-    #announcement-bar {
-        height: 35px;
-        padding: 6px 0;
-    }
-
-    #announcement-message {
-        font-size: 0.9rem !important;
-    }
+    font-family: Arial, sans-serif;
+    background-color: #f0fdf4;
+    color: #065f46;
+    margin: 40px;
+    line-height: 1.6;
 }
 
-/* 🔧 Fix for very small devices (≤500px width) */
-@media (max-width: 500px) {
+h1 {
+    color: #15803d;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+}
+
+th {
+    background-color: #bbf7d0;
+}
+
+.filter {
+    margin-bottom: 20px;
+}
+
+.section {
+    margin-top: 40px;
+}
+
+/* ✅ Announcement hover pause */
+#announcement-bar:hover #announcement-message {
+    animation-play-state: paused;
+}
+
+/* 📱 Tablet screens */
+@media (max-width: 768px) {
     body {
-        margin: 10px;
-        font-size: 1.05rem; /* Bigger base text */
+        margin: 20px;
+        font-size: 1rem;
+        line-height: 1.5;
     }
 
     h1 {
         font-size: 1.4rem;
         text-align: center;
-        margin-bottom: 15px;
-    }
-
-    h2, h3 {
-        font-size: 1.2rem;
     }
 
     table {
         width: 100%;
-        font-size: 1rem; /* ✅ Larger text in tables */
-        border-collapse: collapse;
-        overflow-x: auto;
-        display: block;
+        font-size: 1rem;
     }
 
     th, td {
-        padding: 10px;
+        padding: 8px;
+    }
+}
+
+/* 📱 Small screens (≤500px) — convert tables to cards */
+@media (max-width: 500px) {
+    body {
+        margin: 12px;
+        font-size: 1.05rem;
+        line-height: 1.7;
     }
 
-    .filter, .section p {
-        font-size: 1rem; /* Normal readable text */
+    h1 {
+        font-size: 1.5rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    h2, h3 {
+        font-size: 1.25rem;
+        margin-top: 25px;
+    }
+
+    /* 🟩 Convert tables into card lists */
+    table {
+        display: none; /* Hide the old table */
+    }
+
+    /* Each table row becomes a card */
+    .mobile-card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .mobile-card {
+        background-color: #bbf7d0;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .mobile-card p {
+        margin: 4px 0;
+        font-size: 1rem;
     }
 
     input, select, button {
         font-size: 1rem;
-        padding: 6px 10px;
+        padding: 8px 10px;
     }
 
-    /* Keep announcement readable but not huge */
+    /* Announcement text */
     #announcement-message {
         font-size: 1rem;
     }
 }
 
-
-        }
     </style>
 </head>
 <body>
@@ -169,6 +181,20 @@
             {% endfor %}
         </table>
 
+        <div class="mobile-card-list">
+            {% for r in room_data %}
+                <div class="mobile-card">
+                    <p><strong>Room:</strong> {{ r.room }}</p>
+                    <p><strong>Total:</strong> ₦{{ r.total|floatformat:2 }}</p>
+                </div>
+            {% empty %}
+                <div class="mobile-card">
+                    <p>No rooms found</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+
         <h3>Expenses ({{ month_name|default:"All Months" }})</h3>
         <table>
             <tr>
@@ -187,6 +213,20 @@
             {% endfor %}
         </table>
     </div>
+    <div class="mobile-card-list">
+        {% for e in expenses %}
+            <div class="mobile-card">
+                <p><strong>Date:</strong> {{ e.date_added|date:"d M, Y" }}</p>
+                <p><strong>Description:</strong> {{ e.description }}</p>
+                <p><strong>Amount:</strong> ₦{{ e.amount|floatformat:2 }}</p>
+            </div>
+        {% empty %}
+            <div class="mobile-card">
+                <p>No expenses recorded.</p>
+            </div>
+        {% endfor %}
+    </div>
+    
 
     <div class="section">
         <h2>💰 Overall Summary (All Time)</h2>
