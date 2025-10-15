@@ -314,61 +314,58 @@ th {
             {% endfor %}
         ];
     
-        let currentIndex = 0;
         const msgDiv = document.getElementById("announcement-message");
+        let currentIndex = 0;
     
-        // 🧠 Adjust speed based on screen width
-        function getScrollDuration() {
+        function getScrollDuration(textLength) {
             const width = window.innerWidth;
-            if (width <= 500) return 14;   // slower on very small screens
-            if (width <= 768) return 12;   // medium speed
-            return 10;                     // normal for desktop
+            // Longer messages scroll longer
+            let baseTime = Math.max(10, textLength / 10);
+            if (width <= 500) baseTime *= 1.5;
+            return baseTime;
         }
     
         function showNextMessage() {
-            if (announcements.length === 0) return;
+            if (!announcements.length) return;
     
             const item = announcements[currentIndex];
             msgDiv.textContent = item.text;
     
-            // Style based on importance
-            msgDiv.style.fontWeight = item.important ? "normal" : "bold";
+            // Apply styles
+            msgDiv.style.fontWeight = item.important ? "bold" : "normal";
             msgDiv.style.color = item.important ? "#064e3b" : "#065f46";
     
-            // Get dynamic duration
-            const duration = getScrollDuration();
+            // Reset position before each scroll
+            msgDiv.style.left = "100%";
+            msgDiv.style.transition = "none";
     
-            // Restart animation
-            msgDiv.style.animation = "none";
-            void msgDiv.offsetWidth; // reflow trick
-            msgDiv.style.animation = `scrollMessage ${duration}s linear forwards`;
-    
-            // After animation ends, show next
+            // Wait a tiny bit before scrolling
             setTimeout(() => {
-                currentIndex = (currentIndex + 1) % announcements.length;
-                showNextMessage();
-            }, duration * 1000);
+                const textWidth = msgDiv.offsetWidth;
+                const duration = getScrollDuration(textWidth);
+    
+                msgDiv.style.transition = `left ${duration}s linear`;
+                msgDiv.style.left = `-${textWidth}px`;
+    
+                // Move to the next message after it fully scrolls out
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % announcements.length;
+                    showNextMessage();
+                }, duration * 1000 + 500);
+            }, 300);
         }
     
-        // Define CSS keyframes
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes scrollMessage {
-                0% { left: 100%; opacity: 1; }
-                100% { left: -100%; opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
-    
-        // Start the loop
+        // Start loop
         showNextMessage();
     
-        // Recalculate duration on screen resize
-        window.addEventListener('resize', () => {
-            // Restart animation smoothly if screen orientation or width changes
+        // Restart animation on resize
+        window.addEventListener("resize", () => {
+            msgDiv.style.transition = "none";
+            msgDiv.style.left = "100%";
             showNextMessage();
         });
     </script>
+    
     
 </body>
 </html>
