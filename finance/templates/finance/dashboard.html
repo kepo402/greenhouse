@@ -92,7 +92,6 @@ th {
         display: none; /* Hide the old table */
     }
 
-    /* Each table row becomes a card */
     .mobile-card-list {
         display: flex;
         flex-direction: column;
@@ -123,7 +122,7 @@ th {
     }
 
     #announcement-message {
-        font-size: 1.2rem !important; /* ✅ Bigger, more visible */
+        font-size: 1.2rem !important;
         line-height: 50px;
     }
 
@@ -155,8 +154,42 @@ th {
     .filter button:hover {
         background-color: #166534;
     }
-
 }
+
+/* ✅ Fix for smaller/older Android phones (itel, Tecno, Infinix) */
+@media (max-width: 600px) {
+    body {
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+
+    #announcement-bar {
+        height: 55px;
+        padding: 8px 0;
+    }
+
+    #announcement-message {
+        font-size: 1.25rem !important;
+        line-height: 55px;
+    }
+
+    #month {
+        width: 100%;
+        font-size: 1.25rem;
+        padding: 12px;
+    }
+
+    .filter button {
+        font-size: 1.2rem;
+        padding: 12px;
+    }
+
+    table, .mobile-card p {
+        font-size: 1.1rem;
+    }
+}
+
+
 
     </style>
 </head>
