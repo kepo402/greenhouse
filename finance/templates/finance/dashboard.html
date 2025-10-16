@@ -235,34 +235,38 @@ th {
         <p><strong>Balance:</strong> ₦{{ balance_month|floatformat:2 }}</p>
 
         <h3>Room Contributions ({{ month_name|default:"All Months" }})</h3>
-        <table>
-            <tr>
-                <th>Room</th>
-                <th>Total (₦)</th>
-            </tr>
-            {% for r in room_data %}
-            <tr>
-                <td>{{ r.room }}</td>
-                <td>{{ r.total|floatformat:2 }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="2">No rooms found</td></tr>
-            {% endfor %}
-        </table>
+<table>
+    <tr>
+        <th>Room</th>
+        <th>This Month (₦)</th>
+        <th>All Time (₦)</th>
+    </tr>
+    {% for r in room_data %}
+    <tr>
+        <td>{{ r.room }}</td>
+        <td>{{ r.month_total|floatformat:2 }}</td>
+        <td>{{ r.overall_total|floatformat:2 }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No rooms found</td></tr>
+    {% endfor %}
+</table>
 
-        <div class="mobile-card-list">
-            {% for r in room_data %}
-                <div class="mobile-card">
-                    <p><strong>Room:</strong> {{ r.room }}</p>
-                    <p><strong>Total:</strong> ₦{{ r.total|floatformat:2 }}</p>
-                </div>
-            {% empty %}
-                <div class="mobile-card">
-                    <p>No rooms found</p>
-                </div>
-            {% endfor %}
+
+<div class="mobile-card-list">
+    {% for r in room_data %}
+        <div class="mobile-card">
+            <p><strong>Room:</strong> {{ r.room }}</p>
+            <p><strong>This Month:</strong> ₦{{ r.month_total|floatformat:2 }}</p>
+            <p><strong>All Time:</strong> ₦{{ r.overall_total|floatformat:2 }}</p>
         </div>
-        
+    {% empty %}
+        <div class="mobile-card">
+            <p>No rooms found</p>
+        </div>
+    {% endfor %}
+</div>
+
 
         <h3>Expenses ({{ month_name|default:"All Months" }})</h3>
         <table>

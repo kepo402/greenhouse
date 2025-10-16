@@ -4,53 +4,61 @@ from django.db.models import Sum
 from datetime import datetime
 
 def dashboard(request):
-
-
+    # 🧹 Clean up old announcements
     Announcement.delete_old_non_important()
-
     announcements = Announcement.objects.order_by('-is_important', '-date_posted')
 
-    # Get selected month (e.g., '2025-10')
     selected_month = request.GET.get('month')
     month_name = None
 
     if selected_month:
-        # Convert month like '2025-10' to readable name
+        year = int(selected_month[:4])
+        month = int(selected_month[5:7])
         month_name = datetime.strptime(selected_month, "%Y-%m").strftime("%B %Y")
-        contributions = Contribution.objects.filter(date_added__year=selected_month[:4],
-                                                    date_added__month=selected_month[5:7])
-        expenses = Expense.objects.filter(date_added__year=selected_month[:4],
-                                          date_added__month=selected_month[5:7])
-    else:
-        contributions = Contribution.objects.all()
-        expenses = Expense.objects.all()
 
+        # Filter for selected month
+        contributions_month = Contribution.objects.filter(
+            date_added__year=year,
+            date_added__month=month
+        )
+        expenses_month = Expense.objects.filter(
+            date_added__year=year,
+            date_added__month=month
+        )
+    else:
+        contributions_month = Contribution.objects.none()
+        expenses_month = Expense.objects.none()
+
+    # All data (for overall)
+    contributions_all = Contribution.objects.all()
+    expenses_all = Expense.objects.all()
     rooms = Room.objects.all()
 
-    # Monthly totals
-    total_contributions_month = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
-    total_expenses_month = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
+    # 🟩 Calculate totals
+    total_contributions_month = contributions_month.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expenses_month = expenses_month.aggregate(Sum('amount'))['amount__sum'] or 0
     balance_month = total_contributions_month - total_expenses_month
 
-    # Overall totals
-    total_contributions_all = Contribution.objects.aggregate(Sum('amount'))['amount__sum'] or 0
-    total_expenses_all = Expense.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_contributions_all = contributions_all.aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expenses_all = expenses_all.aggregate(Sum('amount'))['amount__sum'] or 0
     balance_all = total_contributions_all - total_expenses_all
 
-    # Room contributions for the selected month
+    # 🟩 Combine room data (month + all time)
     room_data = []
     for room in rooms:
-        room_total = contributions.filter(room=room).aggregate(Sum('amount'))['amount__sum'] or 0
+        month_total = contributions_month.filter(room=room).aggregate(Sum('amount'))['amount__sum'] or 0
+        overall_total = contributions_all.filter(room=room).aggregate(Sum('amount'))['amount__sum'] or 0
         room_data.append({
             'room': room.number,
-            'total': room_total
+            'month_total': month_total,
+            'overall_total': overall_total,
         })
 
     context = {
         'selected_month': selected_month,
         'month_name': month_name,
         'room_data': room_data,
-        'expenses': expenses,
+        'expenses': expenses_month if selected_month else expenses_all,
         'total_contributions_month': total_contributions_month,
         'total_expenses_month': total_expenses_month,
         'balance_month': balance_month,
@@ -61,4 +69,3 @@ def dashboard(request):
     }
 
     return render(request, 'finance/dashboard.html', context)
-
