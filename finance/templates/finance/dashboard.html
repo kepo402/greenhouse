@@ -314,20 +314,34 @@ th {
             </div>
         {% endif %}
     
-        <h3 style="margin-top:20px;">All Expenses (All Time)</h3>
-        {% for e in expenses_all %}
-            <div class="mobile-card">
-                <p><strong>Date:</strong> {{ e.date_added|date:"d M, Y" }}</p>
-                <p><strong>Description:</strong> {{ e.description }}</p>
-                <p><strong>Amount:</strong> ₦{{ e.amount|floatformat:2 }}</p>
-            </div>
-        {% empty %}
-            <div class="mobile-card">
-                <p>No expenses recorded at all.</p>
-            </div>
-        {% endfor %}
-    </div>
+        <!-- 🟩 Collapsible All Expenses section -->
+        <button id="toggle-all-expenses" style="
+            margin-top:20px;
+            width:100%;
+            font-size:1.1rem;
+            padding:10px;
+            background-color:#15803d;
+            color:white;
+            border:none;
+            border-radius:6px;
+        ">
+            Show All Expenses ▼
+        </button>
     
+        <div id="all-expenses-section" style="display:none; margin-top:10px;">
+            {% for e in expenses_all %}
+                <div class="mobile-card">
+                    <p><strong>Date:</strong> {{ e.date_added|date:"d M, Y" }}</p>
+                    <p><strong>Description:</strong> {{ e.description }}</p>
+                    <p><strong>Amount:</strong> ₦{{ e.amount|floatformat:2 }}</p>
+                </div>
+            {% empty %}
+                <div class="mobile-card">
+                    <p>No expenses recorded at all.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
     
 
     <div class="section">
@@ -338,6 +352,17 @@ th {
     </div>
 
     <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const toggleButton = document.getElementById("toggle-all-expenses");
+    const section = document.getElementById("all-expenses-section");
+
+    toggleButton.addEventListener("click", function() {
+        const isHidden = section.style.display === "none";
+        section.style.display = isHidden ? "block" : "none";
+        toggleButton.textContent = isHidden ? "Hide All Expenses ▲" : "Show All Expenses ▼";
+    });
+});
 
 document.addEventListener("DOMContentLoaded", function() {
     const monthInput = document.getElementById("month");
