@@ -309,6 +309,21 @@ th {
     </div>
 
     <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const monthInput = document.getElementById("month");
+    const form = monthInput.closest("form");
+
+    if (!monthInput.value) {
+        const now = new Date();
+        const currentMonth = now.toISOString().slice(0, 7); // e.g. "2025-10"
+        monthInput.value = currentMonth;
+
+        // 🔄 Automatically submit to show current month’s data
+        form.submit();
+    }
+});
+
         const announcements = [
             {% for a in announcements %}
                 {
