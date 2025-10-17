@@ -268,26 +268,54 @@ th {
 </div>
 
 
-        <h3>Expenses ({{ month_name|default:"All Months" }})</h3>
-        <table>
-            <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount (₦)</th>
-            </tr>
-            {% for e in expenses %}
-            <tr>
-                <td>{{ e.date_added|date:"d M, Y" }}</td>
-                <td>{{ e.description }}</td>
-                <td>{{ e.amount|floatformat:2 }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="3">No expenses recorded.</td></tr>
-            {% endfor %}
-        </table>
+<h3>Expenses ({{ month_name|default:"All Months" }})</h3>
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Amount (₦)</th>
+    </tr>
+
+    {% for e in expenses_month %}
+    <tr style="background-color:#ecfdf5;">
+        <td>{{ e.date_added|date:"d M, Y" }}</td>
+        <td>{{ e.description }}</td>
+        <td>{{ e.amount|floatformat:2 }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No expenses recorded for this month.</td></tr>
+    {% endfor %}
+
+    <tr><td colspan="3" style="background:#a7f3d0; font-weight:bold;">All Expenses (Total List)</td></tr>
+
+    {% for e in expenses_all %}
+    <tr>
+        <td>{{ e.date_added|date:"d M, Y" }}</td>
+        <td>{{ e.description }}</td>
+        <td>{{ e.amount|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
     </div>
     <div class="mobile-card-list">
-        {% for e in expenses %}
+        {% if expenses_month %}
+            <h3 style="margin-top:15px;">Expenses for {{ month_name|default:"This Month" }}</h3>
+            {% for e in expenses_month %}
+                <div class="mobile-card" style="background-color:#ecfdf5;">
+                    <p><strong>Date:</strong> {{ e.date_added|date:"d M, Y" }}</p>
+                    <p><strong>Description:</strong> {{ e.description }}</p>
+                    <p><strong>Amount:</strong> ₦{{ e.amount|floatformat:2 }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="mobile-card">
+                <p>No expenses recorded for this month.</p>
+            </div>
+        {% endif %}
+    
+        <h3 style="margin-top:20px;">All Expenses (All Time)</h3>
+        {% for e in expenses_all %}
             <div class="mobile-card">
                 <p><strong>Date:</strong> {{ e.date_added|date:"d M, Y" }}</p>
                 <p><strong>Description:</strong> {{ e.description }}</p>
@@ -295,10 +323,11 @@ th {
             </div>
         {% empty %}
             <div class="mobile-card">
-                <p>No expenses recorded.</p>
+                <p>No expenses recorded at all.</p>
             </div>
         {% endfor %}
     </div>
+    
     
 
     <div class="section">

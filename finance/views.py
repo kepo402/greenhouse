@@ -16,7 +16,7 @@ def dashboard(request):
         month = int(selected_month[5:7])
         month_name = datetime.strptime(selected_month, "%Y-%m").strftime("%B %Y")
 
-        # Filter for selected month
+        # 🟩 Filter for selected month
         contributions_month = Contribution.objects.filter(
             date_added__year=year,
             date_added__month=month
@@ -29,12 +29,12 @@ def dashboard(request):
         contributions_month = Contribution.objects.none()
         expenses_month = Expense.objects.none()
 
-    # All data (for overall)
+    # 🟩 All-time data
     contributions_all = Contribution.objects.all()
-    expenses_all = Expense.objects.all()
+    expenses_all = Expense.objects.all().order_by('-date_added')
     rooms = Room.objects.all()
 
-    # 🟩 Calculate totals
+    # 🟩 Totals
     total_contributions_month = contributions_month.aggregate(Sum('amount'))['amount__sum'] or 0
     total_expenses_month = expenses_month.aggregate(Sum('amount'))['amount__sum'] or 0
     balance_month = total_contributions_month - total_expenses_month
@@ -43,7 +43,7 @@ def dashboard(request):
     total_expenses_all = expenses_all.aggregate(Sum('amount'))['amount__sum'] or 0
     balance_all = total_contributions_all - total_expenses_all
 
-    # 🟩 Combine room data (month + all time)
+    # 🟩 Room contributions (monthly + overall)
     room_data = []
     for room in rooms:
         month_total = contributions_month.filter(room=room).aggregate(Sum('amount'))['amount__sum'] or 0
@@ -58,13 +58,19 @@ def dashboard(request):
         'selected_month': selected_month,
         'month_name': month_name,
         'room_data': room_data,
-        'expenses': expenses_month if selected_month else expenses_all,
+
+        # 🟩 Send both monthly and all-time expenses
+        'expenses_month': expenses_month,
+        'expenses_all': expenses_all,
+
         'total_contributions_month': total_contributions_month,
         'total_expenses_month': total_expenses_month,
         'balance_month': balance_month,
+
         'total_contributions_all': total_contributions_all,
         'total_expenses_all': total_expenses_all,
         'balance_all': balance_all,
+
         'announcements': announcements,
     }
 
