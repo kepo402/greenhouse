@@ -1,7 +1,2 @@
-{
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "@vercel/python"
-    }
-  }
-}
+from greenhouse.wsgi import application
+app = application
