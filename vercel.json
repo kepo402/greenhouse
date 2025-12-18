@@ -10,7 +10,7 @@
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "greenhouse/wsgi.py"
+        "dest": "api/greenhouse/wsgi.py"
       }
     ]
   }
