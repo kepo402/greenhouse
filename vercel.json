@@ -1,8 +1,8 @@
 {
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "@vercel/python"
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
     }
-  }
+  ]
 }
-
