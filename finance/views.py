@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Room, Contribution, Expense, Announcement
 from django.db.models import Sum
 from datetime import datetime
+from django.http import JsonResponse
 
 def dashboard(request):
     # 🧹 Clean up old announcements
@@ -75,3 +76,85 @@ def dashboard(request):
     }
 
     return render(request, 'finance/dashboard.html', context)
+def dashboard_api(request):
+    selected_month = request.GET.get("month")
+    month_name = ""
+
+    if selected_month:
+        year = int(selected_month[:4])
+        month = int(selected_month[5:7])
+        month_name = datetime.strptime(selected_month, "%Y-%m").strftime("%B %Y")
+
+        contributions_month = Contribution.objects.filter(
+            date_added__year=year,
+            date_added__month=month
+        )
+        expenses_month = Expense.objects.filter(
+            date_added__year=year,
+            date_added__month=month
+        )
+    else:
+        contributions_month = Contribution.objects.none()
+        expenses_month = Expense.objects.none()
+
+    contributions_all = Contribution.objects.all()
+    expenses_all = Expense.objects.all().order_by('-date_added')
+    rooms = Room.objects.all()
+
+    # 🔢 Totals
+    total_contributions_month = contributions_month.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    total_expenses_month = expenses_month.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    total_contributions_all = contributions_all.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    total_expenses_all = expenses_all.aggregate(
+        total=Sum('amount')
+    )['total'] or 0
+
+    # 🏠 Room data
+    room_data = []
+    for room in rooms:
+        room_data.append({
+            "room": room.number,
+            "month_total": contributions_month.filter(room=room).aggregate(
+                total=Sum('amount')
+            )['total'] or 0,
+            "overall_total": contributions_all.filter(room=room).aggregate(
+                total=Sum('amount')
+            )['total'] or 0,
+        })
+
+    response_data = {
+        "month_name": month_name,
+        "monthly_summary": {
+            "total_contributions": total_contributions_month,
+            "total_expenses": total_expenses_month,
+            "balance": total_contributions_month - total_expenses_month,
+        },
+        "overall_summary": {
+            "total_contributions": total_contributions_all,
+            "total_expenses": total_expenses_all,
+            "balance": total_contributions_all - total_expenses_all,
+        },
+        "room_data": room_data,
+        "expenses_month": list(expenses_month.values(
+            "id", "description", "amount", "date_added"
+        )),
+        "expenses_all": list(expenses_all.values(
+            "id", "description", "amount", "date_added"
+        )),
+        "announcements": list(
+            Announcement.objects.order_by('-is_important', '-date_posted')
+            .values("id", "message", "is_important", "date_posted")
+
+        ),
+    }
+
+    return JsonResponse(response_data, safe=False)
