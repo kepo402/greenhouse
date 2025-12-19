@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['localhost','127.0.0.1',"greenhouse-7ppl.onrender.com", '4d0d-102-88-108-82.ngrok-free.app', 'yoruba-memorize-itftjkeyx-olayinkas-projects-8dfff35b.vercel.app']
 CSRF_TRUSTED_ORIGINS = [
     'https://greenhouse-7ppl.onrender.com,',
+    "https://green-house-hostel-finance-rjrrvgh7h.vercel.app",
 ]
 
 
