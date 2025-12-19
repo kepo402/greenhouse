@@ -2,17 +2,31 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.py",
+      "src": "cac_registration/wsgi.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "50mb"
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12"
       }
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "api/index.py"
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "cacregistrations.com"
+        }
+      ],
+      "headers": {
+        "Location": "https://www.cacregistrations.com/:1"
+      },
+      "status": 301
+    },
+    {
+      "src": "/(.*)",
+      "dest": "cac_registration/wsgi.py"
     }
   ]
 }
