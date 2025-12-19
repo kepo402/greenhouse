@@ -24,11 +24,22 @@ SECRET_KEY = 'django-insecure-cxw)y=-3&ke-px7rs4(ubc3=w$i39y_3vz(-82n*@c6ivtq0nw
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'greenhouse-7ppl.onrender.com',  # Render backend
+    'green-house-hostel-finance-rjrrvgh7h.vercel.app',  # Frontend
+]
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1',"greenhouse-7ppl.onrender.com", '4d0d-102-88-108-82.ngrok-free.app', 'yoruba-memorize-itftjkeyx-olayinkas-projects-8dfff35b.vercel.app']
 CSRF_TRUSTED_ORIGINS = [
-    'https://greenhouse-7ppl.onrender.com,',
-    "https://green-house-hostel-finance-rjrrvgh7h.vercel.app",
+    'https://greenhouse-7ppl.onrender.com',
+    'https://green-house-hostel-finance-rjrrvgh7h.vercel.app',
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://green-house-hostel-finance.vercel.app",  # frontend
+    "http://localhost:3000",  # local dev
 ]
 
 
@@ -41,19 +52,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "corsheaders",
      'finance',
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'greenhouse.urls'
 
